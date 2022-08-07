@@ -47,8 +47,8 @@ fun readBooleanProperty(propName: String, defaultValue: Boolean): Boolean {
     return readProperty(propName)?.toBoolean() ?: defaultValue
 }
 
-fun readProperties(): Map<String, String> {
-    var properties = mutableMapOf<String, String>()
+fun readProperties(): Map<String, String?> {
+    val properties = mutableMapOf<String, String?>()
     var process: Process? = null
     try {
         process = ProcessBuilder().command("/system/bin/getprop")
@@ -58,7 +58,9 @@ fun readProperties(): Map<String, String> {
         while (bufferedReader.readLine().also { line = it } != null) {
             val matches = GETPROP_PATTERN.matcher(line!!)
             if (matches.find()) {
-                properties[matches.group(1)] = matches.group(2)
+                matches.group(1)?.let {
+                    properties[it] = matches.group(2)
+                }
             }
         }
     } finally {
